@@ -53,15 +53,17 @@ export const usePullToRefresh: UsePullToRefresh = ({
 			let currentPullLength = 0;
 			const pulledDown = pullStartPosition < touch.screenY;
 			if ((pulledDown && !pullUp) || (!pulledDown && pullUp)) {
-				currentPullLength = Math.abs(touch.screenY - pullStartPosition)
+				currentPullLength = Math.abs(touch.screenY - pullStartPosition);
 			}
 
-			const inZone = pullUp ? pullStartPosition > (window.screen.height * 2) / 3 : pullStartPosition < window.screen.height / 3
+			const inZone = pullUp
+				? pullStartPosition > (window.screen.height * 2) / 3
+				: pullStartPosition < window.screen.height / 3;
 			if (currentPullLength <= maximumPullLength && inZone) {
 				setPullPosition(() => currentPullLength);
 			}
 		},
-		[isDisabled, maximumPullLength, pullStartPosition]
+		[isDisabled, maximumPullLength, pullStartPosition, pullUp]
 	);
 
 	const onEndPull = useCallback(() => {
