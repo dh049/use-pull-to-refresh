@@ -10,6 +10,7 @@ export type UsePullToRefreshParams = {
 	// default value is 180
 	refreshThreshold?: number;
 	isDisabled?: boolean;
+	pullUp?: boolean;
 };
 export type UsePullToRefreshReturn = {
 	isRefreshing: boolean;
@@ -23,7 +24,8 @@ export const usePullToRefresh: UsePullToRefresh = ({
 	onRefresh,
 	maximumPullLength = DEFAULT_MAXIMUM_PULL_LENGTH,
 	refreshThreshold = DEFAULT_REFRESH_THRESHOLD,
-	isDisabled = false
+	isDisabled = false,
+	pullUp = false
 }: UsePullToRefreshParams) => {
 	const [pullStartPosition, setPullStartPosition] = useState(0);
 	const [pullPosition, setPullPosition] = useState(0);
@@ -48,10 +50,16 @@ export const usePullToRefresh: UsePullToRefresh = ({
 
 			if (!touch) return;
 
-			const currentPullLength = pullStartPosition < touch.screenY ? Math.abs(touch.screenY - pullStartPosition) : 0;
+			let currentPullLength = 0;
+			const pulledDown = pullStartPosition < touch.screenY;
+			if ((pulledDown && !pullUp) || (!pulledDown && pullUp)) {
+				currentPullLength = Math.abs(touch.screenY - pullStartPosition)
+			}
 
-			if (currentPullLength <= maximumPullLength && pullStartPosition < window.screen.height / 3)
+			const inZone = pullUp ? pullStartPosition > (window.screen.height * 2) / 3 : pullStartPosition < window.screen.height / 3
+			if (currentPullLength <= maximumPullLength && inZone) {
 				setPullPosition(() => currentPullLength);
+			}
 		},
 		[isDisabled, maximumPullLength, pullStartPosition]
 	);
